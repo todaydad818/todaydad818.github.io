@@ -53,34 +53,6 @@ body {
   background: linear-gradient(rgba(10,8,6,0.55), rgba(10,8,6,0.85)), url("cover.jpg") center/cover fixed;
 }
 
-/* ===== FIERCE DOG SVG ===== */
-.beast-container {
-  position: relative;
-  width: 240px; height: 220px;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 30px rgba(180,30,30,0.3));
-}
-.beast-container .glow {
-  position: absolute; top: 50%; left: 50%;
-  width: 280px; height: 280px;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(180,30,30,0.15) 0%, transparent 70%);
-  animation: pulseGlow 3s ease-in-out infinite;
-}
-@keyframes pulseGlow {
-  0%, 100% { transform: translate(-50%,-50%) scale(1); opacity: 0.5; }
-  50% { transform: translate(-50%,-50%) scale(1.3); opacity: 1; }
-}
-.beast-container svg {
-  position: relative; z-index: 2;
-  animation: beastBreathe 3s ease-in-out infinite;
-}
-@keyframes beastBreathe {
-  0%, 100% { transform: scale(1) translateY(0); }
-  50% { transform: scale(1.03) translateY(-5px); }
-}
-
 /* ===== TITLE ===== */
 .title-block { position: relative; margin-bottom: 10px; }
 
@@ -133,61 +105,6 @@ body {
   height: 2px;
   background: linear-gradient(90deg, transparent, #8b1a1a, #d4a843, #8b1a1a, transparent);
   margin-bottom: 30px;
-}
-
-/* ===== CHARACTER BANNER ===== */
-.char-banner {
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
-  margin-bottom: 35px;
-  max-width: 700px;
-}
-
-.char-portrait {
-  flex: 1;
-  min-width: 110px; max-width: 130px;
-  padding: 15px 8px 12px;
-  background: linear-gradient(180deg, rgba(30,15,10,0.8) 0%, rgba(10,8,6,0.9) 100%);
-  border: 1px solid rgba(139,26,26,0.3);
-  position: relative;
-  text-align: center;
-  transition: all 0.3s;
-  cursor: default;
-}
-.char-portrait::before {
-  content: "";
-  position: absolute; top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #8b1a1a, transparent);
-}
-.char-portrait:hover {
-  transform: translateY(-10px) scale(1.05);
-  border-color: rgba(180,30,30,0.6);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(180,30,30,0.15);
-  z-index: 10;
-}
-
-.char-portrait .avatar-svg {
-  width: 70px; height: 80px;
-  margin: 0 auto 8px;
-  display: block;
-}
-
-.char-portrait .name {
-  font-size: 0.9rem;
-  font-weight: 900;
-  color: #f6d365;
-  letter-spacing: 0.1em;
-}
-.char-portrait .role {
-  font-size: 0.65rem;
-  color: #6a5a3a;
-  margin-top: 3px;
-}
-.char-portrait .blood {
-  position: absolute; bottom: 5px; right: 8px;
-  font-size: 0.6rem;
-  color: #5a1a1a;
-  opacity: 0.5;
 }
 
 /* ===== INTRO ===== */
@@ -270,14 +187,6 @@ body {
 }
 
 /* ===== BLOOD SPLATTER ANIMATION ===== */
-.blood-drop {
-  position: fixed;
-  width: 3px; height: 3px;
-  background: rgba(139,26,26,0.15);
-  border-radius: 50%;
-  pointer-events: none;
-  animation: bloodFall linear infinite;
-}
 @keyframes bloodFall {
   0% { transform: translateY(-10vh) scale(0); opacity: 0; }
   10% { opacity: 0.3; }
@@ -312,9 +221,7 @@ body {
 <section class="hero">
 
   <!-- Fierce Dog SVG - Hong Kong comic style -->
-  <div class="beast-container">
-    <div class="glow"></div>
-    <svg viewBox="0 0 240 220" width="240" height="220">
+  <svg viewBox="0 0 240 220" width="240" height="220">
       <!-- Body - muscular, angular -->
       <path d="M80 160 Q60 140 55 110 Q50 85 70 75 L80 70 Q95 60 110 55 L130 50 L150 52 Q170 55 185 65 L200 75 Q215 90 218 110 Q220 130 210 150 L200 165 Q190 175 175 178 L160 180 Q140 182 120 180 L100 178 Q85 175 80 165 Z" fill="#1a0f08" stroke="#8b1a1a" stroke-width="2"/>
       <!-- Shoulder muscles -->
@@ -384,19 +291,7 @@ body {
   <div class="brush-divider"></div>
 
   <!-- 5 Characters Banner -->
-  <div class="char-banner">
-    <!-- 1. 阿金/小天 -->
-    <div class="char-portrait">
-      <svg class="avatar-svg" viewBox="0 0 70 80">
-        <path d="M20 65 Q15 45 20 35 Q25 20 35 18 Q45 20 50 35 Q55 45 50 65 Z" fill="#1a0f08" stroke="#8b1a1a" stroke-width="1.5"/>
-        <circle cx="30" cy="30" r="3" fill="#ff0000" opacity="0.8"/>
-        <circle cx="40" cy="30" r="3" fill="#ff0000" opacity="0.8"/>
-        <path d="M25 40 L35 45 L45 40" stroke="#8b1a1a" stroke-width="2" fill="none"/>
-        <path d="M15 55 Q25 48 35 50 Q45 48 55 55" stroke="#5a1a1a" stroke-width="1" fill="none"/>
-        <text x="35" y="75" text-anchor="middle" font-size="9" fill="#f6d365" font-weight="900">狗神</text>
-      </svg>
-      <div class="name">阿金/小天</div>
-      <div class="role">转世凶犬</div>
+  <div class="role">转世凶犬</div>
       <div class="blood">✕</div>
     </div>
     <!-- 2. 杨开心 -->

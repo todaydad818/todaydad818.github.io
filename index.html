@@ -5,36 +5,333 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>数士 - 玄幻小说</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;700&display=swap');
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #333; line-height: 1.8; }
-.container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
-h1 { font-size: 2.5em; text-align: center; margin-bottom: 10px; color: #2c3e50; }
-.subtitle { text-align: center; color: #888; margin-bottom: 40px; }
-.intro { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 30px; }
-.intro p { text-indent: 2em; margin-bottom: 1em; }
-.btn { display: inline-block; background: #3498db; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-size: 1.1em; margin-top: 10px; }
-.btn:hover { background: #2980b9; }
-.links { text-align: center; margin-top: 30px; }
-.links a { color: #3498db; text-decoration: none; margin: 0 15px; }
-.links a:hover { text-decoration: underline; }
+
+body {
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  background: #0a0a12;
+  color: #e0d5c1;
+  overflow-x: hidden;
+}
+
+/* Stars background */
+.stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle var(--dur) ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  0% { opacity: 0.2; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Hero section */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(100,50,150,0.15) 0%, transparent 60%),
+              radial-gradient(ellipse at 50% 100%, rgba(200,150,50,0.08) 0%, transparent 50%);
+}
+
+/* Dog SVG */
+.dog-container {
+  position: relative;
+  width: 200px; height: 200px;
+  margin-bottom: 30px;
+  animation: floatDog 4s ease-in-out infinite;
+}
+@keyframes floatDog {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+/* Mystic circle */
+.mystic-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 260px; height: 260px;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(200,170,100,0.2);
+  border-radius: 50%;
+  animation: spin 20s linear infinite;
+}
+.mystic-ring2 {
+  width: 220px; height: 220px;
+  border-color: rgba(150,100,200,0.15);
+  animation-direction: reverse;
+  animation-duration: 15s;
+}
+@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+/* Title */
+.title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #f6d365 0%, #d4a843 30%, #f6d365 50%, #c4943a 70%, #f6d365 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 4s ease-in-out infinite;
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 60px rgba(210,170,70,0.3);
+  margin-bottom: 10px;
+}
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #a09070;
+  letter-spacing: 0.5em;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+/* Intro text */
+.intro-box {
+  max-width: 700px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(200,170,100,0.1);
+  border-radius: 16px;
+  padding: 30px 35px;
+  margin-bottom: 40px;
+  backdrop-filter: blur(10px);
+  line-height: 2;
+  font-size: 1rem;
+  color: #c4b89a;
+}
+.intro-box p { text-indent: 2em; margin-bottom: 0.5em; }
+.intro-box .highlight { color: #f6d365; }
+
+/* Characters */
+.characters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+.character-card {
+  width: 120px;
+  text-align: center;
+  padding: 20px 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(200,170,100,0.08);
+  border-radius: 12px;
+  transition: all 0.3s;
+  cursor: default;
+}
+.character-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(200,170,100,0.3);
+  box-shadow: 0 8px 30px rgba(100,50,150,0.15);
+}
+.character-card .avatar {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+.character-card .name {
+  font-size: 0.9rem;
+  color: #f6d365;
+  font-weight: 700;
+}
+.character-card .role {
+  font-size: 0.75rem;
+  color: #8a7a5a;
+  margin-top: 4px;
+}
+
+/* Buttons */
+.buttons { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 36px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all 0.3s;
+  letter-spacing: 0.1em;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #d4a843, #b8862a);
+  color: #1a1a0a;
+  box-shadow: 0 4px 20px rgba(200,150,50,0.3);
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(200,150,50,0.5); }
+.btn-outline {
+  border: 1px solid rgba(200,170,100,0.3);
+  color: #d4a843;
+}
+.btn-outline:hover { background: rgba(200,170,100,0.1); transform: translateY(-3px); }
+
+/* Footer */
+.footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 30px;
+  color: #5a4a3a;
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(200,170,100,0.05);
+}
+
+/* Floating particles */
+.particle {
+  position: fixed;
+  width: 4px; height: 4px;
+  background: rgba(200,170,100,0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>数士</h1>
-<p class="subtitle">一部玄幻小说</p>
-<div class="intro">
-<p>卑微的小狗阿金，在一次意外中重生为人，从此踏上了一条充满奇遇与挑战的数士之路……</p>
-<p>这是一个关于成长、友情与命运的故事。</p>
-</div>
-<div class="links">
-<a href="directory.html" class="btn">📖 阅读目录</a>
-</div>
-<div class="links" style="margin-top:20px;font-size:0.9em;color:#999;">
-<p>共 660 章 · 持续更新中</p>
-</div>
-</div>
-<div id="giscus-container" style="margin-top: 60px;">
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<!-- Hero -->
+<section class="hero">
+
+  <!-- Dog SVG -->
+  <div class="dog-container">
+    <div class="mystic-ring"></div>
+    <div class="mystic-ring mystic-ring2"></div>
+    <svg viewBox="0 0 200 200" width="200" height="200" style="position:relative;z-index:2;">
+      <!-- Body -->
+      <ellipse cx="110" cy="130" rx="45" ry="35" fill="#8B6914" stroke="#D4A843" stroke-width="1.5"/>
+      <!-- Head -->
+      <circle cx="160" cy="95" r="28" fill="#A0782C" stroke="#D4A843" stroke-width="1.5"/>
+      <!-- Ear -->
+      <ellipse cx="175" cy="75" rx="12" ry="18" fill="#6B4914" transform="rotate(20,175,75)"/>
+      <ellipse cx="145" cy="73" rx="10" ry="16" fill="#6B4914" transform="rotate(-15,145,73)"/>
+      <!-- Eyes -->
+      <ellipse cx="168" cy="90" rx="4" ry="5" fill="#FFD700"/>
+      <ellipse cx="152" cy="90" rx="4" ry="5" fill="#FFD700"/>
+      <circle cx="168" cy="90" r="2.5" fill="#1a1a0a"/>
+      <circle cx="152" cy="90" r="2.5" fill="#1a1a0a"/>
+      <!-- Nose -->
+      <ellipse cx="162" cy="102" rx="5" ry="3.5" fill="#4a3a1a"/>
+      <!-- Mouth -->
+      <path d="M157 106 Q162 112 167 106" stroke="#4a3a1a" stroke-width="1.2" fill="none"/>
+      <!-- Tail -->
+      <path d="M65 125 Q45 100 55 80" stroke="#D4A843" stroke-width="3" fill="none" stroke-linecap="round">
+        <animate attributeName="d" values="M65 125 Q45 100 55 80;M65 125 Q40 95 50 75;M65 125 Q45 100 55 80" dur="2s" repeatCount="indefinite"/>
+      </path>
+      <!-- Legs -->
+      <rect x="92" y="155" width="10" height="20" rx="4" fill="#8B6914"/>
+      <rect x="115" y="155" width="10" height="20" rx="4" fill="#8B6914"/>
+      <rect x="78" y="150" width="10" height="22" rx="4" fill="#7A5A14"/>
+      <rect x="130" y="150" width="10" height="22" rx="4" fill="#7A5A14"/>
+      <!-- Glow effect -->
+      <circle cx="160" cy="95" r="32" fill="none" stroke="rgba(255,215,0,0.15)" stroke-width="2">
+        <animate attributeName="r" values="32;38;32" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite"/>
+      </circle>
+    </svg>
+  </div>
+
+  <h1 class="title">数 士</h1>
+  <p class="subtitle">— 玄 幻 小 说 —</p>
+
+  <div class="intro-box">
+    <p>卑微的小狗<span class="highlight">阿金</span>，在一次意外中重生为人，从此踏上了一条充满奇遇与挑战的<span class="highlight">数士</span>之路……</p>
+    <p>这是一个关于成长、友情与命运的故事。</p>
+  </div>
+
+  <!-- Characters -->
+  <div class="characters">
+    <div class="character-card">
+      <div class="avatar">🐺</div>
+      <div class="name">阿金 / 小天</div>
+      <div class="role">主角 · 转世之犬</div>
+    </div>
+    <div class="character-card">
+      <div class="avatar">💪</div>
+      <div class="name">杨开心</div>
+      <div class="role">乞丐 · 生死之交</div>
+    </div>
+    <div class="character-card">
+      <div class="avatar">🌙</div>
+      <div class="name">杨蔓</div>
+      <div class="role">黑斗篷 · 军团首领</div>
+    </div>
+    <div class="character-card">
+      <div class="avatar">⚡</div>
+      <div class="name">李小龙</div>
+      <div class="role">数士 · 铁血领袖</div>
+    </div>
+    <div class="character-card">
+      <div class="avatar">🎭</div>
+      <div class="name">小哑巴</div>
+      <div class="role">神秘 · 仙姿佚貌</div>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <a href="directory.html" class="btn btn-primary">📖 开始阅读</a>
+    <a href="https://github.com/todaydad818/todaydad818.github.io" class="btn btn-outline" target="_blank">⭐ GitHub</a>
+  </div>
+  <p style="margin-top:20px;font-size:0.85rem;color:#5a4a3a;">共 660 章 · 持续更新中</p>
+</section>
+
+<div class="footer">Copyright &copy; 2026 数士 · All Rights Reserved</div>
+
+<script>
+// Generate stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 200; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 3 + 1;
+  s.style.width = size + 'px';
+  s.style.height = size + 'px';
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 100 + '%';
+  s.style.setProperty('--dur', (Math.random() * 3 + 2) + 's');
+  s.style.animationDelay = Math.random() * 5 + 's';
+  starsEl.appendChild(s);
+}
+
+// Floating particles
+const particlesEl = document.getElementById('particles');
+for (let i = 0; i < 15; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.width = p.style.height = (Math.random() * 4 + 2) + 'px';
+  p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+  p.style.animationDelay = Math.random() * 15 + 's';
+  particlesEl.appendChild(p);
+}
+</script>
+
+<!-- Giscus -->
+<div id="giscus-container" style="position:relative;z-index:1;max-width:750px;margin:0 auto;padding:20px;">
 <script src="https://giscus.app/client.js"
         data-repo="todaydad818/todaydad818.github.io"
         data-repo-id="R_kgDOTKsOgw"
@@ -45,7 +342,7 @@ h1 { font-size: 2.5em; text-align: center; margin-bottom: 10px; color: #2c3e50; 
         data-reactions-enabled="1"
         data-emit-metadata="0"
         data-input-position="bottom"
-        data-theme="preferred_color_scheme"
+        data-theme="dark"
         data-lang="zh-CN"
         crossorigin="anonymous"
         async>

@@ -108,6 +108,30 @@ body {
   margin-bottom: 30px;
 }
 
+
+/* ===== CHARACTERS HORIZONTAL ===== */
+.char-row {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 4px;
+  margin-bottom: 25px;
+}
+.char-card {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: rgba(30,15,10,0.5);
+  border: 1px solid rgba(139,26,26,0.2);
+  font-size: 0.85rem;
+  transition: all 0.3s;
+  cursor: default;
+}
+.char-card:hover {
+  border-color: rgba(139,26,26,0.5);
+  background: rgba(30,15,10,0.8);
+  transform: translateY(-2px);
+}
+.char-card .c-name { color: #f6d365; font-weight: 900; }
+.char-card .c-title { color: #8a7a5a; font-size: 0.75rem; margin-left: 4px; }
+.char-card .c-mark { color: #5a1a1a; font-size: 0.7rem; margin-left: 4px; }
+
 /* ===== INTRO ===== */
 .intro-box {
   max-width: 680px;
@@ -233,6 +257,15 @@ body {
   <p class="subtitle">送给金天14岁的生日礼物</p>
   <div class="hero-line"></div>
   <div class="brush-divider"></div>
+
+  <div class="char-row">
+    <div class="char-card"><span class="c-name">阿金/小天</span><span class="c-title">转世凶犬</span><span class="c-mark">✕</span></div>
+    <div class="char-card"><span class="c-name">杨开心</span><span class="c-title">铁血战兽</span><span class="c-mark">✕</span></div>
+    <div class="char-card"><span class="c-name">杨蔓</span><span class="c-title">冥府之花</span><span class="c-mark">✕</span></div>
+    <div class="char-card"><span class="c-name">李小龙</span><span class="c-title">铁血领袖</span><span class="c-mark">✕</span></div>
+    <div class="char-card"><span class="c-name">小哑巴</span><span class="c-title">谪仙临凡</span><span class="c-mark">✕</span></div>
+  </div>
+
 
   <!-- 5 Characters Banner -->
   <div class="role">转世凶犬</div>

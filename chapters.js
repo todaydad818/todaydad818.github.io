@@ -1,4 +1,4 @@
-// 章节列表，自动生成
+// 章节列表（唯一数据源）
 var chapterList = [
   "第01节 卑微的阿金.html",
   "第02节 人狗神.html",
@@ -670,31 +670,37 @@ var chapterList = [
   "第668节 小结局.html",
 ];
 
+// 上一节/下一节导航
 document.addEventListener("DOMContentLoaded", function() {
-  var current = window.location.pathname.split("/").pop();
-  // URL解码
-  current = decodeURIComponent(current);
+  var current = decodeURIComponent(window.location.pathname.split("/").pop());
   var idx = chapterList.indexOf(current);
   if (idx === -1) {
-    // 尝试匹配含空格等变体
     for (var i = 0; i < chapterList.length; i++) {
-      if (chapterList[i].replace(/\s/g,"") === current.replace(/\s/g,"")) {
-        idx = i; break;
-      }
+      if (chapterList[i].replace(/\s/g,"") === current.replace(/\s/g,"")) { idx = i; break; }
     }
   }
-  if (idx >= 0) {
-    var nav = document.getElementById("chapter-nav");
-    if (nav) {
-      var html = "";
-      if (idx > 0) {
-        html += "<a href=\"" + chapterList[idx-1] + "\">← 上一节</a>";
-      }
-      if (idx < chapterList.length - 1) {
-        if (html) html += " | ";
-        html += "<a href=\"" + chapterList[idx+1] + "\">下一节 →</a>";
-      }
-      nav.innerHTML = html;
+  // 导航栏
+  var nav = document.getElementById("chapter-nav");
+  if (nav && idx >= 0) {
+    var h = "";
+    if (idx > 0) h += "<a href=\"" + chapterList[idx-1] + "\">← 上一节</a>";
+    if (idx < chapterList.length - 1) {
+      if (h) h += " | ";
+      h += "<a href=\"" + chapterList[idx+1] + "\">下一节 →</a>";
     }
+    nav.innerHTML = h;
   }
+  // 目录表
+  var tbl = document.getElementById("dir-tbody");
+  if (tbl) {
+    var rows = "";
+    for (var i = 0; i < chapterList.length; i++) {
+      var title = chapterList[i].replace(".html", "");
+      rows += "<tr><td><a href=\"chapters/" + chapterList[i] + "\">" + title + "</a></td></tr>";
+    }
+    tbl.innerHTML = rows;
+  }
+  // 总章数
+  var cnt = document.getElementById("chapter-count");
+  if (cnt) cnt.textContent = "共 " + chapterList.length + " 章";
 });

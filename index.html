@@ -248,11 +248,17 @@ body {
     <p>一次<span class="hl-red">浴血重生</span>，它化为人形，踏上<span class="hl-gold">数士</span>之路——一条以<span class="hl-red">血肉</span>和<span class="hl-gold">铁骨</span>铺就的修罗道。</p>
     <p>这是一个关于<span class="hl-gold">成长</span>与<span class="hl-red">复仇</span>、<span class="hl-gold">友情</span>与<span class="hl-red">背叛</span>的故事。</p>
   
-  <!-- Voice Selector -->
-  <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.9rem;color:#a09080;flex-wrap:wrap">
-    <button id="voice-prev" style="background:none;border:none;color:#d4a843;font-size:1.5rem;cursor:pointer;padding:4px 8px" title="上一个音色">◀</button>
-    <span id="voice-label" style="min-width:200px;text-align:center;font-size:0.85rem">朗读音色：<span id="voice-name" style="color:#f6d365">加载中...</span></span>
-    <button id="voice-next" style="background:none;border:none;color:#d4a843;font-size:1.5rem;cursor:pointer;padding:4px 8px" title="下一个音色">▶</button>
+  <!-- Voice & Speed Selector -->
+  <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:8px 16px;font-size:0.9rem;color:#a09080;flex-wrap:wrap">
+    <!-- 音色 -->
+    <button id="voice-prev" style="background:none;border:none;color:#d4a843;font-size:1.5rem;cursor:pointer;padding:2px 6px" title="上一个音色">◀</button>
+    <span id="voice-label" style="text-align:center;font-size:0.85rem">朗读音色：<span id="voice-name" style="color:#f6d365">加载中...</span></span>
+    <button id="voice-next" style="background:none;border:none;color:#d4a843;font-size:1.5rem;cursor:pointer;padding:2px 6px" title="下一个音色">▶</button>
+    <span style="color:#504030;margin:0 4px">|</span>
+    <!-- 速度 -->
+    <button id="speed-prev" style="background:none;border:none;color:#d4a843;font-size:1.5rem;cursor:pointer;padding:2px 6px" title="减慢10%">◀</button>
+    <span style="font-size:0.85rem">速度：<span id="speed-val" style="color:#f6d365;min-width:40px;display:inline-block;text-align:center">120%</span></span>
+    <button id="speed-next" style="background:none;border:none;color:#d4a843;font-size:1.5rem;cursor:pointer;padding:2px 6px" title="加快10%">▶</button>
   </div>
   <!-- Buttons -->
   <div class="buttons">
@@ -322,14 +328,33 @@ for (let i = 0; i < 20; i++) {
             playIntro();
         }
     }
+    function cycleSpeed(dir) {
+        if (window.cycleReaderSpeed) {
+            window.cycleReaderSpeed(dir);
+            updateSpeedLabel();
+            playIntro();
+        }
+    }
+    function updateSpeedLabel() {
+        var s = window.getReaderSpeed ? window.getReaderSpeed() : "120%";
+        if (speedSpan) speedSpan.textContent = s;
+    }
 
     if (prevBtn) prevBtn.onclick = function() { cycle(-1); };
     if (nextBtn) nextBtn.onclick = function() { cycle(1); };
+    if (speedPrev) speedPrev.onclick = function() { cycleSpeed(-1); };
+    if (speedNext) speedNext.onclick = function() { cycleSpeed(1); };
+    var speedPrev = document.getElementById("speed-prev");
+    var speedNext = document.getElementById("speed-next");
+    var speedSpan = document.getElementById("speed-val");
 
     // 延迟更新显示（等语音列表加载）
     setTimeout(updateLabel, 1000);
+    setTimeout(updateSpeedLabel, 1000);
     setTimeout(updateLabel, 2000);
+    setTimeout(updateSpeedLabel, 2000);
     setTimeout(updateLabel, 3000);
+    setTimeout(updateSpeedLabel, 3000);
 
     // 点击音色名显示可用列表
     if (labelSpan) {

@@ -3,11 +3,34 @@
     var synth = window.speechSynthesis;
     var utterance = null;
     var btn;
-    var STORAGE_KEY = "shushi_voice";
+    var VOICE_KEY = "shushi_voice";
+    var SPEED_KEY = "shushi_speed";
     var DEFAULT_VOICE = "Microsoft Kangkang - Chinese (Simplified, PRC)";
-    var SPEED = 1.2;  // 120%
+    var DEFAULT_SPEED = 1.2;
 
-    // ===== 获取本地中文语音列表 =====
+    // ===== 速度读写 =====
+    function getSpeed() {
+        var v = parseFloat(localStorage.getItem(SPEED_KEY));
+        return isNaN(v) ? DEFAULT_SPEED : Math.max(0.3, Math.min(3.0, v));
+    }
+    function saveSpeed(val) {
+        try { localStorage.setItem(SPEED_KEY, String(val)); } catch(e) {}
+    }
+
+    window.getReaderSpeed = function() {
+        return Math.round(getSpeed() * 100) + "%";
+    };
+
+    window.cycleReaderSpeed = function(dir) {
+        var cur = getSpeed();
+        var step = 0.1;
+        var newSpeed = Math.round((cur + dir * step) * 10) / 10;
+        newSpeed = Math.max(0.3, Math.min(3.0, newSpeed));
+        saveSpeed(newSpeed);
+        return newSpeed;
+    };
+
+    // ===== 语音读写 =====
     function getLocalChineseVoices() {
         var result = [];
         var voices = synth.getVoices();
@@ -16,32 +39,17 @@
         }
         return result;
     }
-
-    // ===== 按名字找语音 =====
     function findVoiceByName(name) {
         var voices = synth.getVoices();
-        for (var v of voices) {
-            if (v.name === name) return v;
-        }
+        for (var v of voices) { if (v.name === name) return v; }
         return null;
     }
-
-    // ===== 获取保存的语音名 =====
     function getSavedVoiceName() {
-        return localStorage.getItem(STORAGE_KEY) || DEFAULT_VOICE;
+        return localStorage.getItem(VOICE_KEY) || DEFAULT_VOICE;
     }
+    window.getReaderVoiceName = function() { return getSavedVoiceName(); };
+    function saveVoiceName(name) { try { localStorage.setItem(VOICE_KEY, name); } catch(e) {} }
 
-    // ===== 获取当前音色名 =====
-    window.getReaderVoiceName = function() {
-        return getSavedVoiceName();
-    };
-
-    // ===== 保存语音名 =====
-    function saveVoiceName(name) {
-        try { localStorage.setItem(STORAGE_KEY, name); } catch(e) {}
-    }
-
-    // ===== 获取要用的语音对象 =====
     function getVoice() {
         var saved = getSavedVoiceName();
         var v = findVoiceByName(saved);
@@ -50,7 +58,6 @@
         return local.length > 0 ? local[0] : null;
     }
 
-    // ===== 循环切换音色（首页用） =====
     window.cycleReaderVoice = function(direction) {
         var local = getLocalChineseVoices();
         if (local.length === 0) return null;
@@ -66,20 +73,19 @@
         return newVoice;
     };
 
-    // ===== 朗读指定文字（首页用） =====
+    // ===== 朗读 =====
     window.speakText = function(text, callback) {
         if (!text) return;
         synth.cancel();
         var utter = new SpeechSynthesisUtterance(text);
         utter.lang = "zh-CN";
-        utter.rate = SPEED;
+        utter.rate = getSpeed();
         var voice = getVoice();
         if (voice) utter.voice = voice;
         if (callback) utter.onend = callback;
         synth.speak(utter);
     };
 
-    // ===== 章节页朗读正文 =====
     function getContentText() {
         var content = document.querySelector(".content");
         if (!content) return "";
@@ -105,7 +111,7 @@
         if (!text) { btn.textContent = "\uD83D\uDD07 无可读内容"; return; }
         utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "zh-CN";
-        utterance.rate = SPEED;
+        utterance.rate = getSpeed();
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         var voice = getVoice();
@@ -119,7 +125,6 @@
         btn.textContent = "\u23F8 暂停";
     }
 
-    // ===== 初始化章节页按钮 =====
     function init() {
         var content = document.querySelector(".content");
         if (!content) return;
@@ -134,7 +139,6 @@
         if (synth.onvoiceschanged !== undefined) synth.getVoices();
     }
 
-    // ===== 预加载语音列表 =====
     var preloaded = false;
     function ensureVoices() {
         if (preloaded) return;

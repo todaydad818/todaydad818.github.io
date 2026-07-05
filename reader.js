@@ -5,6 +5,7 @@
     var btn;
     var STORAGE_KEY = "shushi_voice";
     var DEFAULT_VOICE = "Microsoft Kangkang - Chinese (Simplified, PRC)";
+    var SPEED = 1.2;  // 120%
 
     // ===== 获取本地中文语音列表 =====
     function getLocalChineseVoices() {
@@ -45,7 +46,6 @@
         var saved = getSavedVoiceName();
         var v = findVoiceByName(saved);
         if (v) return v;
-        // 如果保存的不可用，用第一个本地中文
         var local = getLocalChineseVoices();
         return local.length > 0 ? local[0] : null;
     }
@@ -54,32 +54,28 @@
     window.cycleReaderVoice = function(direction) {
         var local = getLocalChineseVoices();
         if (local.length === 0) return null;
-
         var current = getSavedVoiceName();
         var idx = -1;
         for (var i = 0; i < local.length; i++) {
             if (local[i].name === current) { idx = i; break; }
         }
         if (idx === -1) idx = 0;
-
         var newIdx = (idx + direction + local.length) % local.length;
         var newVoice = local[newIdx];
         saveVoiceName(newVoice.name);
         return newVoice;
     };
 
-    // ===== 朗读指定文字 =====
+    // ===== 朗读指定文字（首页用） =====
     window.speakText = function(text, callback) {
         if (!text) return;
         synth.cancel();
         var utter = new SpeechSynthesisUtterance(text);
         utter.lang = "zh-CN";
-        utter.rate = 0.95;
+        utter.rate = SPEED;
         var voice = getVoice();
         if (voice) utter.voice = voice;
-        if (callback) {
-            utter.onend = callback;
-        }
+        if (callback) utter.onend = callback;
         synth.speak(utter);
     };
 
@@ -109,7 +105,7 @@
         if (!text) { btn.textContent = "\uD83D\uDD07 无可读内容"; return; }
         utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "zh-CN";
-        utterance.rate = 1.0;
+        utterance.rate = SPEED;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         var voice = getVoice();

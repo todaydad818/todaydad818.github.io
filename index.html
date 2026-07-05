@@ -337,13 +337,13 @@ for (let i = 0; i < 20; i++) {
         if (speedSpan) speedSpan.textContent = s;
     }
 
+    var speedPrev = document.getElementById("speed-prev");
+    var speedNext = document.getElementById("speed-next");
+    var speedSpan = document.getElementById("speed-val");
     if (prevBtn) prevBtn.onclick = function() { cycle(-1); };
     if (nextBtn) nextBtn.onclick = function() { cycle(1); };
     if (speedPrev) speedPrev.onclick = function() { cycleSpeed(-1); };
     if (speedNext) speedNext.onclick = function() { cycleSpeed(1); };
-    var speedPrev = document.getElementById("speed-prev");
-    var speedNext = document.getElementById("speed-next");
-    var speedSpan = document.getElementById("speed-val");
 
     // 延迟更新显示（等语音列表加载）
     setTimeout(updateLabel, 1000);

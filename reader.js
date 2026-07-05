@@ -6,7 +6,7 @@
     var VOICE_KEY = "shushi_voice";
     var SPEED_KEY = "shushi_speed";
     var DEFAULT_VOICE = "Microsoft Kangkang - Chinese (Simplified, PRC)";
-    var DEFAULT_SPEED = 1.5;
+    var DEFAULT_SPEED = 1.2;
 
     // ===== 速度读写 =====
     function getSpeed() {

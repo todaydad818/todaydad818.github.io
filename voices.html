@@ -8,122 +8,93 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"Microsoft YaHei","Noto Sans SC",sans-serif;background:#0a0a12;color:#e0d5c1;line-height:2;font-size:17px;padding:40px 20px}
 .container{max-width:600px;margin:0 auto}
-h1{text-align:center;color:#f6d365;margin-bottom:30px}
-.voice-item{padding:12px 16px;margin:6px 0;border:1px solid rgba(200,170,100,0.2);border-radius:6px;cursor:pointer}
+h1{text-align:center;color:#f6d365;margin-bottom:10px}
+.sub{text-align:center;color:#706050;margin-bottom:25px;font-size:14px}
+.voice-item{padding:12px 16px;margin:6px 0;border:1px solid rgba(200,170,100,0.2);border-radius:6px;cursor:pointer;transition:.2s}
 .voice-item:hover{background:rgba(200,170,100,0.1)}
 .voice-item.selected{background:rgba(212,168,67,0.2);border-color:#d4a843}
 .voice-name{font-size:16px;color:#f6d365}
 .voice-lang{font-size:13px;color:#a09080;margin-left:8px}
-.voice-info{font-size:12px;color:#706050;margin-left:8px}
-#test-text{width:100%;padding:10px;border:1px solid rgba(200,170,100,0.3);background:#1a1a28;color:#e0d5c1;border-radius:4px;margin:15px 0;font-size:15px;font-family:inherit}
-#play-btn{background:#d4a843;color:#0a0a12;border:none;padding:10px 24px;font-size:15px;border-radius:4px;cursor:pointer;margin-bottom:20px}
-#play-btn:hover{background:#e4b853}
-#status{color:#a09080;margin:10px 0}
+.voice-info{font-size:12px;color:#555}
+#status{text-align:center;padding:10px;color:#d4a843;min-height:40px}
 #loading{text-align:center;padding:40px;color:#706050}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>🎤 音色测试</h1>
-<p style="margin-bottom:20px;color:#a09080">选择下方一个音色，点击"试听"可听到朗读效果。</p>
-<textarea id="test-text" rows="3">你好，欢迎来到数士的世界。我是小天，一条被狗神附体的小狗。</textarea>
-<button id="play-btn" onclick="testVoice()">▶ 试听</button>
-<div id="status"></div>
+<h1>🎤 选择朗读音色</h1>
+<p class="sub">点击下面任意一项试听，选好告诉我名字即可。</p>
+<div id="status">等待选择</div>
 <div id="loading">正在加载语音列表……</div>
 <div id="voice-list"></div>
 </div>
 <script>
 var synth = window.speechSynthesis;
-var selectedVoice = null;
 
-function loadVoices() {
+function testVoice(voice) {
+    synth.cancel();
+    var utter = new SpeechSynthesisUtterance("你好，欢迎来到数士的世界。我是阿金，一条被狗神附体的小狗。希望我的故事能让你开心。");
+    utter.lang = "zh-CN";
+    utter.rate = 0.95;
+    if (voice) utter.voice = voice;
+    utter.onstart = function() { document.getElementById("status").textContent = "▶ 正在播放: " + voice.name; };
+    utter.onend = function() { document.getElementById("status").textContent = "✓ 播放结束: " + voice.name; };
+    utter.onerror = function() { document.getElementById("status").textContent = "✗ 播放失败: " + voice.name; };
+    synth.speak(utter);
+}
+
+function renderVoices() {
     var voices = synth.getVoices();
     var container = document.getElementById("voice-list");
     var loading = document.getElementById("loading");
     if (voices.length === 0) {
-        loading.textContent = "暂未检测到语音，请刷新页面或更换浏览器";
+        loading.textContent = "暂未检测到语音，请刷新页面";
         return;
     }
     loading.style.display = "none";
 
-    var zhVoices = voices.filter(function(v) {
-        var l = v.lang || "";
-        return l.startsWith("zh") || l.startsWith("cmn");
+    // 中文放前面
+    var sorted = Array.from(voices).sort(function(a,b) {
+        var aZ = (a.lang||"").startsWith("zh") ? 0 : 1;
+        var bZ = (b.lang||"").startsWith("zh") ? 0 : 1;
+        return aZ - bZ;
     });
-    
-    // Show all voices with Chinese ones first
-    var sorted = zhVoices.concat(voices.filter(function(v) {
-        var l = v.lang || "";
-        return !(l.startsWith("zh") || l.startsWith("cmn"));
-    }));
-    
+
     var html = "";
     for (var i = 0; i < sorted.length; i++) {
         var v = sorted[i];
         var isZh = (v.lang || "").startsWith("zh");
-        var cls = isZh ? "" : " style=\"opacity:0.4\"";
-        html += '<div class="voice-item" data-idx="' + i + '" onclick="selectVoice(this,' + i + ')"' + cls + '>';
+        var cls = "";
+        html += '<div class="voice-item" onclick="selectAndPlay(this,' + i + ')"' + cls + '>';
         html += '<span class="voice-name">' + v.name + '</span>';
         html += '<span class="voice-lang">' + v.lang + '</span>';
-        html += '<span class="voice-info">' + (v.localService ? '本地' : '网络') + ' | ' + (isZh ? '中文' : '非中文') + '</span>';
+        html += '<span class="voice-info"> | ' + (v.localService ? '本地' : '网络') + '</span>';
+        if (!isZh) html += ' <span style="color:#555;font-size:12px">(非中文)</span>';
         html += '</div>';
     }
     container.innerHTML = html;
-    
-    // Auto-select first Chinese female voice
-    for (var i = 0; i < sorted.length; i++) {
-        var n = sorted[i].name;
-        if ((n.indexOf("ting") >= 0 || n.indexOf("Ting") >= 0 || n.indexOf("女") >= 0 || n.indexOf("Xiaoxiao") >= 0 || n.indexOf("Xiaohan") >= 0) && (sorted[i].lang || "").startsWith("zh")) {
-            var el = container.querySelectorAll(".voice-item")[i];
-            if (el) { selectVoice(el, i); break; }
-        }
-    }
-    // Fallback: first Chinese voice
-    if (!selectedVoice && zhVoices.length > 0) {
-        for (var i = 0; i < sorted.length; i++) {
-            if ((sorted[i].lang || "").startsWith("zh")) {
-                var el = container.querySelectorAll(".voice-item")[i];
-                if (el) { selectVoice(el, i); break; }
-            }
-        }
-    }
 }
 
-function selectVoice(el, idx) {
+function selectAndPlay(el, idx) {
     document.querySelectorAll(".voice-item").forEach(function(e) { e.classList.remove("selected"); });
     el.classList.add("selected");
     var voices = synth.getVoices();
-    selectedVoice = voices[Object.keys(synth.getVoices).length > 0 ? idx : idx];
-    // Voices list might be fresh, use a different approach
-    var allVoices = synth.getVoices();
+    var actualIdx = 0;
     var items = document.querySelectorAll(".voice-item");
-    var realIdx = 0;
     for (var i = 0; i < items.length; i++) {
-        if (items[i] === el) { realIdx = i; break; }
+        if (items[i] === el) { actualIdx = i; break; }
     }
-    selectedVoice = allVoices[realIdx];
-    document.getElementById("status").textContent = "已选: " + selectedVoice.name;
+    var voice = voices[actualIdx];
+    if (voice) testVoice(voice);
 }
 
-function testVoice() {
-    var text = document.getElementById("test-text").value;
-    if (!text) { document.getElementById("status").textContent = "请输入文字"; return; }
-    synth.cancel();
-    var utter = new SpeechSynthesisUtterance(text);
-    utter.lang = "zh-CN";
-    utter.rate = 1.0;
-    if (selectedVoice) utter.voice = selectedVoice;
-    utter.onstart = function() { document.getElementById("status").textContent = "播放中…"; };
-    utter.onend = function() { document.getElementById("status").textContent = "播放完成"; };
-    utter.onerror = function() { document.getElementById("status").textContent = "播放失败"; };
-    synth.speak(utter);
-}
-
-// Load voices - Chrome needs async
-loadVoices();
+// 初始化
+renderVoices();
 if (synth.onvoiceschanged !== undefined) {
-    synth.onvoiceschanged = loadVoices;
+    synth.onvoiceschanged = renderVoices;
 }
+// Chrome 有时需要双重触发
+setTimeout(renderVoices, 500);
 </script>
 </body>
 </html>

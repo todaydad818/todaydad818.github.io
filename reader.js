@@ -1,25 +1,26 @@
-﻿// 朗读器 - 使用 Web Speech API
+﻿// 朗读器 - Web Speech API
 (function() {
     var synth = window.speechSynthesis;
     var utterance = null;
     var isPlaying = false;
-    var btn, statusEl;
+    var btn;
 
-    function getChineseVoice() {
-        var voices = synth.getVoices();
-        // 优先：中文女声
-        for (var v of voices) {
-            var lang = v.lang || "";
-            if (lang.startsWith("zh") || lang.startsWith("cmn")) {
-                if (lang.indexOf("CN") >= 0 || lang.indexOf("HKG") >= 0 || lang.indexOf("TWN") >= 0) {
-                    return v;
-                }
+    function getPreferredVoice(voices) {
+        // 优先名单：年轻女声
+        var preferred = ["Xiaoxiao", "Xiaohan", "Xiaoyi", "Xiaomeng", "Yunjian", "Tingting", "Mei-Jia", "Huihui", "Zhiyu", "Yaoyao"];
+        // 先找中文女声里的优先名单
+        for (var p of preferred) {
+            for (var v of voices) {
+                if ((v.lang || "").startsWith("zh") && v.name.indexOf(p) >= 0) return v;
             }
         }
-        // 其次：任何中文
+        // 其次：任何中文女声
         for (var v of voices) {
-            var lang = v.lang || "";
-            if (lang.startsWith("zh") || lang.startsWith("cmn")) return v;
+            if ((v.lang || "").startsWith("zh") && (v.name.indexOf("Female") >= 0 || v.name.indexOf("女") >= 0)) return v;
+        }
+        // 再次：任何中文
+        for (var v of voices) {
+            if ((v.lang || "").startsWith("zh")) return v;
         }
         return null;
     }
@@ -27,95 +28,74 @@
     function getContentText() {
         var content = document.querySelector(".content");
         if (!content) return "";
-        // 提取纯文本，去掉标题行和分隔符
-        var text = content.innerText || content.textContent || "";
-        // 移除章节标题（第一行）
-        var lines = text.split("\n").filter(function(l) { return l.trim(); });
-        // 过滤掉纯数字、纯分隔符的行
-        lines = lines.filter(function(l) {
-            return l.trim() !== "—" && l.trim() !== "-" && l.length > 2;
-        });
-        return lines.join("。");
+        // 跳过标题行，从正文开始
+        var ps = content.querySelectorAll("p");
+        var parts = [];
+        for (var i = 0; i < ps.length; i++) {
+            var txt = ps[i].textContent.trim();
+            // 跳过标题行（如 "第01节 卑微的阿金"）
+            if (i === 0 && /^第\d+节/.test(txt)) continue;
+            // 跳过纯数字/纯短行
+            if (txt.length < 2) continue;
+            if (/^[\d\-—\s]+$/.test(txt)) continue;
+            parts.push(txt);
+        }
+        return parts.join("。");
     }
 
     function speak() {
         if (synth.speaking && !synth.paused) {
             synth.cancel();
-        }
-
-        var text = getContentText();
-        if (!text) {
-            setStatus("无可读内容");
+            btn.textContent = "🔊 朗读本文";
             return;
         }
 
+        var text = getContentText();
+        if (!text) { btn.textContent = "🔇 无可读内容"; return; }
+
         utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "zh-CN";
-        utterance.rate = 1.0;     // 语速
-        utterance.pitch = 1.0;    // 音调
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
-        var voice = getChineseVoice();
+        var voice = getPreferredVoice(synth.getVoices());
         if (voice) utterance.voice = voice;
 
-        utterance.onstart = function() { isPlaying = true; setStatus("朗读中… 点击暂停"); };
-        utterance.onend = function() { isPlaying = false; setStatus("朗读完毕"); };
-        utterance.onerror = function() { isPlaying = false; setStatus("朗读出错"); };
-        utterance.onpause = function() { isPlaying = false; setStatus("已暂停"); };
-        utterance.onresume = function() { isPlaying = true; setStatus("朗读中… 点击暂停"); };
+        utterance.onstart = function() { isPlaying = true; btn.textContent = "⏸ 暂停"; };
+        utterance.onend = function() { isPlaying = false; btn.textContent = "🔊 朗读本文"; };
+        utterance.onerror = function() { isPlaying = false; btn.textContent = "🔊 朗读本文"; };
+        utterance.onpause = function() { isPlaying = false; btn.textContent = "▶ 继续朗读"; };
+        utterance.onresume = function() { isPlaying = true; btn.textContent = "⏸ 暂停"; };
 
         synth.speak(utterance);
         isPlaying = true;
-        setStatus("朗读中… 点击暂停");
-    }
-
-    function toggle() {
-        if (synth.speaking && !synth.paused) {
-            synth.pause();
-        } else if (synth.paused) {
-            synth.resume();
-        } else {
-            speak();
-        }
-    }
-
-    function setStatus(msg) {
-        if (statusEl) statusEl.textContent = msg;
+        btn.textContent = "⏸ 暂停";
     }
 
     function init() {
-        // 创建UI
-        var container = document.querySelector(".container");
-        if (!container) return;
+        var content = document.querySelector(".content");
+        if (!content) return;
 
-        var div = document.createElement("div");
-        div.style.cssText = "text-align:center;padding:10px 0;margin-bottom:5px";
+        // 找到标题行（第一个 <p>）
+        var firstP = content.querySelector("p");
+        if (!firstP) return;
 
+        // 创建按钮，跟在标题后面
         btn = document.createElement("button");
         btn.textContent = "🔊 朗读本文";
-        btn.style.cssText = "background:#d4a843;color:#0a0a12;border:none;padding:8px 20px;font-size:15px;border-radius:4px;cursor:pointer;font-family:inherit";
-        btn.onclick = toggle;
+        btn.style.cssText = "background:#d4a843;color:#0a0a12;border:none;padding:4px 14px;font-size:14px;border-radius:4px;cursor:pointer;font-family:inherit;vertical-align:middle;margin-left:12px";
 
-        statusEl = document.createElement("span");
-        statusEl.style.cssText = "margin-left:12px;font-size:13px;color:#a09080";
+        btn.onclick = speak;
 
-        div.appendChild(btn);
-        div.appendChild(statusEl);
+        // 插入到标题文字后面
+        firstP.appendChild(btn);
 
-        // 插入到章节导航上方
-        var nav = document.getElementById("chapter-nav");
-        if (nav) {
-            container.insertBefore(div, nav);
-        } else {
-            container.appendChild(div);
-        }
-
-        // Chrome 需要先触发 getVoices
-        if (synth.onvoiceschanged !== undefined) {
-            synth.onvoiceschanged = function() {};
-        }
         // 预加载语音列表
         synth.getVoices();
+        if (synth.onvoiceschanged !== undefined) {
+            synth.getVoices(); // Chrome 需要二次触发
+        }
     }
 
     if (document.readyState === "loading") {
